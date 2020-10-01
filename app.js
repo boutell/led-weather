@@ -1,9 +1,12 @@
 const fs = require('fs');
 const fetch = require('node-fetch');
-const jimp = require('jimp');
+const Jimp = require('jimp');
+const createImage = require('util').promisify((w, h, callback) => {
+  return new Jimp(w, h, callback);
+});
 
 (async () => {
-  const response = await fetch('https://api.openweathermap.org/data/2.5/onecall?lat=40.030564&lon=-75.166984&appid=d7f7c5048c6be884aede27ec9cf8ce92');
+  const response = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=40.030564&lon=-75.166984&appid=${process.env.OPENWEATHERMAP_API_KEY}');
   const data = await response.json();
   const hourly = data.hourly;
   const iconsPath = `${__dirname}/icons`;
@@ -17,14 +20,17 @@ const jimp = require('jimp');
     if (!fs.existsSync(iconPath)) {
       const response = await fetch(`http://openweathermap.org/img/wn/${icon}@2x.png`);
       const iconBuffer = await response.buffer();
-      const image = await jimp.read(iconBuffer);
+      const image = await Jimp.read(iconBuffer);
       await image.resize(32, 32);
-      const outputBuffer = Buffer.alloc(32 * 32 * 3);
+      const outputImage = await createImage(64, 32);
+      outputImage.blit(image, 16, 0, 0, 0, 32, 32);
+      outputImage.write(`${iconPath}.png`);
+      const outputBuffer = Buffer.alloc(64 * 32 * 3);
       let i = 0;
       for (let y = 0; (y < 32); y++) {
-        for (let x = 0; (x < 32); x++) {
-          const p = image.getPixelColor(x, y);
-          const rgba = jimp.intToRGBA(p);
+        for (let x = 0; (x < 64); x++) {
+          const p = outputImage.getPixelColor(x, y);
+          const rgba = Jimp.intToRGBA(p);
           outputBuffer[i++] = rgba.r;
           outputBuffer[i++] = rgba.g;
           outputBuffer[i++] = rgba.b;
@@ -32,7 +38,7 @@ const jimp = require('jimp');
       }
       fs.writeFileSync(iconPath, outputBuffer);
     }
-    fs.writeSync(1, fs.readFileSync(iconPath));
+    // fs.writeSync(1, fs.readFileSync(iconPath));
     await sleep(100);
   }
 })().then(() => {}).catch(e => {
