@@ -11,7 +11,6 @@ const jimp = require('jimp');
     fs.mkdirSync(iconsPath);
   }
   for (const hour of hourly) {
-    console.log(hour);
     const weather = hour.weather[0];
     const icon = weather.icon;
     const iconPath = `${iconsPath}/${icon}.rgb`;
@@ -33,11 +32,14 @@ const jimp = require('jimp');
       }
       fs.writeFileSync(iconPath, outputBuffer);
     }
-    console.log(iconPath);
+    fs.writeSync(1, fs.readFileSync(iconPath));
+    await sleep(100);
   }
 })().then(() => {}).catch(e => {
   console.error(e);
   process.exit(1);
 });
 
-
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
