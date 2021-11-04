@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/boutell/led-weather#readme",
   "dependencies": {
+    "jimp": "^0.16.1",
     "node-fetch": "^3.0.0"
   },
   "type": "module"
