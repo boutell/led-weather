@@ -16,7 +16,6 @@ async function go() {
   const data = await get(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&appid=${apiKey}`, 'json');
   const days = argv.days ? parseInt(argv.days) : 0;
   const { temp, weather } = data.daily[days];
-  console.log(data.daily[days]);
   const date = new Date();
   date.setDate(date.getDate() + days);
   const dayOfWeek = [ 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa' ][date.getDay()];
