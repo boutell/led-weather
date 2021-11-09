@@ -31,7 +31,8 @@ async function go() {
   const font = await Jimp.loadFont(Jimp.FONT_SANS_16_WHITE);
   await image.print(font, 0, 0, max);
   await image.print(font, 0, image.bitmap.height - 16, min);
-  await image.print(font, 48, 8, dayOfWeek);
+  const dayFont = await Jimp.loadFont(Jimp.FONT_SANS_8_WHITE);
+  await image.print(dayFont, 48, 12, dayOfWeek);
   await image.write(argv.filename || 'weather.png');
 }
 
